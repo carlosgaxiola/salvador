@@ -68,14 +68,10 @@ public class MainActivity extends AppCompatActivity {
                     nContacto.setFavorite(this.cbxFav.isChecked() ? 1 : 0);
                     nContacto.setIdMovil(Divice.getSecureId(this));
                     if (this.saveContacto == null) {
-                        php.insertarContacto(nContacto);
-                        mensajeCorto(R.string.mensaje);
-                        limpiar(null);
+                        php.insertarContacto(nContacto, MainActivity.this);
                     }
                     else {
-                        php.actualizarContacto(nContacto, id);
-                        mensajeCorto(R.string.mensaje);
-                        limpiar(null);
+                        php.actualizarContacto(nContacto, id, MainActivity.this);
                     }
                 }
             }

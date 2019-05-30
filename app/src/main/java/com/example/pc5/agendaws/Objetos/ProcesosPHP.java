@@ -14,7 +14,7 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.ArrayList;
 
-public class ProcesosPHP implements Response.Listener<JSONObject>, Response.ErrorListener {
+public class ProcesosPHP {
 
     private RequestQueue request;
     private JsonObjectRequest json;
@@ -25,7 +25,7 @@ public class ProcesosPHP implements Response.Listener<JSONObject>, Response.Erro
         this.request = Volley.newRequestQueue(context);
     }
 
-    public void insertarContacto (Contactos contacto) {
+    public void insertarContacto (Contactos contacto, MainActivity context) {
         String url = serverip + "weRegistro.php?nombre=" + contacto.getNombre() +
                 "&telefono1=" + contacto.getTelefono1() +
                 "&telefono2=" + contacto.getTelefono2() +
@@ -34,11 +34,36 @@ public class ProcesosPHP implements Response.Listener<JSONObject>, Response.Erro
                 "&favorite=" + contacto.getFavorite() +
                 "&idMovil=" + contacto.getIdMovil();
         url = url.replace(" ", "%20");
-        json = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+        json = new JsonObjectRequest(Request.Method.GET, url, null, 
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject data) {
+                    int code = data.getInt("code");
+                    if (code == 1) {
+                        JSONObject contacto = data.getJSONArray("contacto").toJSONObject();                        
+                        int _ID = contacto.getInt("_ID");
+                        contacto.set_ID(_ID);
+                        context.limpiar(null);
+                        mensajeCorto("Contacto agregado!", context);
+                    }
+                    else {
+                        mensajeCorto("No se pudo agregar el contacto", context);
+                        if (!data.getString("mysql_error").equals("")) {
+                            mensajeCorto("MySQL Error: " + data.getString("mysql_error"));
+                        }
+                    }
+                }
+            }, 
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    mensajeCorto("Ocurrio un error: " + volleyError.toString());
+                }
+            });
         request.add(json);
     }
 
-    public void actualizarContacto (Contactos contacto, int id) {
+    public void actualizarContacto (Contactos contacto, int id, MainActivity context) {
         String url = serverip = "wsActualizar.php?_ID=" + id +
                 "&nombre=" + contacto.getNombre() +
                 "&telefono1=" + contacto.getTelefono1() +
@@ -47,23 +72,67 @@ public class ProcesosPHP implements Response.Listener<JSONObject>, Response.Erro
                 "&favorite=" + contacto.getFavorite() +
                 "&notas=" + contacto.getNotas();
         url = url.replace(" ", "%20");
-        json = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+        json = new JsonObjectRequest(Request.Method.GET, url, null, 
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject data) {
+                    int code = data.getInt("code");
+                    switch (code) {
+                        case -1:
+                            mensajeCorto("Error al actualizar", context);
+                            if (!data.getString("mysql_error").equals("")) {
+                                mensajeCorto("MySQL Error: " + data.getString("mysql_error"));
+                            }
+                            break;
+                        case 0:
+                        case 1:
+                            mensajeCorto("Contacto actualizado", context);
+                            context.limpiar(null);
+                            break;
+                    }
+                }
+            }, 
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    mensajeCorto("Ocurrio un error: " + volleyError.toString());
+                }
+            });
         request.add(json);
     }
 
-    public void borrarContacto (int id) {
+    public void borrarContacto (int id, MainActivity context) {
         String url = serverip + "wsEliminar.php?_ID=" + id;
-        json = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
+        json = new JsonObjectRequest(Request.Method.GET, url, null, 
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject data) {
+                    int code = data.getInt("code");
+                    switch (code) {
+                        case 0:
+                            mensajeCorto("No fue posible borrar el contacto", context);
+                            context.limpiar(null);
+                            context.listar(null);
+                            if (!data.getString("mysql_error").equals("")) {
+                                mensajeCorto("MySQL Error: " + data.getString("mysql_error"));
+                            }
+                            break;
+                        case 1:
+                            mensajeCorto("Contacto actualizado", context);
+                            break;
+                    }
+                }
+            }, 
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+                    mensajeCorto("Ocurrio un error: " + volleyError.toString());
+                }
+            });
         request.add(json);
     }
 
-    @Override
-    public void onErrorResponse(VolleyError error) {
-        Log.i("ERROR", error.toString());
-    }
-
-    @Override
-    public void onResponse(JSONObject response) {
-
+    private void mensajeCorto (String mensaje, Context context) {
+        Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show();
     }
 }
