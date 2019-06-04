@@ -30,6 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ListActivity extends AppCompatActivity implements Response.Listener<JSONObject>, Response.ErrorListener {
 
@@ -61,7 +62,7 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
         });
     }
 
-    private void consultarTodosWebService () {
+    public void consultarTodosWebService () {
         String url = server + "wsConsultarTodos.php?idMovil=" + Divice.getSecureId(this);
         request = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
         queue.add(request);
@@ -77,6 +78,7 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
         Contactos contacto = null;
         JSONArray data = response.optJSONArray("contactos");
         try {
+            contactos = new ArrayList<>();
             for (int i = 0; i < data.length(); i++) {
                 contacto = new Contactos();
                 JSONObject json = data.getJSONObject(i);
@@ -89,8 +91,8 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
                 contacto.setFavorite(json.optInt("favorite"));
                 contacto.setIdMovil(json.optString("idMovil"));
                 contactos.add(contacto);
-                cargarContactos();
             }
+            cargarContactos();
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -158,7 +160,7 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
                                 public void onClick(DialogInterface dialog, int which) {
                                     int pos = (int) helpView.getTag(R.string.pos);
                                     int id = contactos.get(pos).get_ID();
-                                    php.borrarContacto(id);
+                                    php.borrarContacto(id, ListActivity.this);
                                     cargarContactos();
                                 }
                             });

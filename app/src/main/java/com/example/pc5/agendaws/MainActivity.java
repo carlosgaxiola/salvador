@@ -1,7 +1,9 @@
 package com.example.pc5.agendaws;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox cbxFav;
     private Contactos saveContacto;
     ProcesosPHP php;
+    private View helpView;
     private int id;
 
     @Override
@@ -47,42 +50,66 @@ public class MainActivity extends AppCompatActivity {
 
     public void guardar (View view) {
         try {
-            if (isNetworkingAvailable()) {
-                boolean valido = false;
-                if (valido = this.txtNombre.getText().toString().equals("")) {
-                    mensajeCorto("Ingresa un nombre");
-                }
-                if (valido = this.txtTel1.getText().toString().equals("")) {
-                    mensajeCorto("Ingresa el teléfono 1");
-                }
-                if (valido = this.txtDir.getText().toString().equals("")) {
-                    mensajeCorto("Ingresa la dirección");
-                }
-                if (!valido) {
-                    Contactos nContacto = new Contactos();
-                    nContacto.setNombre(this.txtNombre.getText().toString());
-                    nContacto.setTelefono1(this.txtTel1.getText().toString());
-                    nContacto.setTelefono2(this.txtTel2.getText().toString());
-                    nContacto.setDireccion(this.txtDir.getText().toString());
-                    nContacto.setNotas(this.txtNotas.getText().toString());
-                    nContacto.setFavorite(this.cbxFav.isChecked() ? 1 : 0);
-                    nContacto.setIdMovil(Divice.getSecureId(this));
-                    if (this.saveContacto == null) {
-                        php.insertarContacto(nContacto, MainActivity.this);
-                    }
-                    else {
-                        php.actualizarContacto(nContacto, id, MainActivity.this);
-                    }
-                }
+            boolean valido = false;
+            if (valido = this.txtNombre.getText().toString().equals("")) {
+                mensajeCorto("Ingresa un nombre");
             }
-            else {
-                mensajeCorto("La conexión a internet es requerida");
+            if (valido = this.txtTel1.getText().toString().equals("")) {
+                mensajeCorto("Ingresa el teléfono 1");
+            }
+            if (valido = this.txtDir.getText().toString().equals("")) {
+                mensajeCorto("Ingresa la dirección");
+            }
+            if (!valido) {
+                Contactos nContacto = new Contactos();
+                nContacto.setNombre(this.txtNombre.getText().toString());
+                nContacto.setTelefono1(this.txtTel1.getText().toString());
+                nContacto.setTelefono2(this.txtTel2.getText().toString());
+                nContacto.setDireccion(this.txtDir.getText().toString());
+                nContacto.setNotas(this.txtNotas.getText().toString());
+                nContacto.setFavorite(this.cbxFav.isChecked() ? 1 : 0);
+                nContacto.setIdMovil(Divice.getSecureId(this));
+                if (!isNetworkingAvailable()) {
+                    mensajeCorto("La conexión a internet es requerida");
+                }
+                else if (this.saveContacto == null) {
+                    php.insertarContacto(nContacto, MainActivity.this);
+                }
+                else if (hayCambios()) {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                    dialog.setTitle("Modificar contacto");
+                    dialog.setMessage("¿Modificar los datos del contacto");
+                    dialog.setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            int pos = (int) helpView.getTag(R.string.pos);
+                            int id = contactos.get(pos).get_ID();
+                            php.borrarContacto(id);
+                            cargarContactos();
+                        }
+                    });
+                    dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    php.actualizar(nCointacto, MainActivity.this);
+                }
             }
         }
         catch (Exception ex) {
             mensajeCorto("Error: " + ex.getMessage());
         }
+    }
 
+    private boolean hayCambios () {
+        return this.saveContacto.getNombre().compareToIgnoreCase(this.txtNombre.getText().toString()) != 0 ||
+                this.saveContacto.getDireccion().compareToIgnoreCase(this.txtDir.getText().toString()) != 0 ||
+                this.saveContacto.getNotas().compareToIgnoreCase(this.txtNotas.getText().toString()) != 0 ||
+                this.saveContacto.getTelefono1().compareToIgnoreCase(this.txtTel1.getText().toString()) != 0 ||
+                this.saveContacto.getTelefono2().compareToIgnoreCase(this.txtTel2.getText().toString()) != 0 ||
+                (this.saveContacto.getFavorite() == 1) != this.cbxFav.isChecked();
     }
 
     private void mensajeCorto (String mensaje) {
