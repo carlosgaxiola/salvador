@@ -25,7 +25,6 @@ public class ProcesosPHP {
     private ArrayList<Contactos> contactos = new ArrayList<>();
     private String serverip = "http://2016030023.000webhostapp.com/WebService/";
     private CallbackHelper callback;
-
     public void setContext (Context context) {
         this.request = Volley.newRequestQueue(context);
     }
