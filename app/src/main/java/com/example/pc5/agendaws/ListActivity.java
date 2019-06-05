@@ -39,7 +39,7 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
     private RequestQueue queue;
     private JsonObjectRequest request;
     private ArrayList<Contactos> contactos;
-    private String server = "https://2016030023.000webhostapp.com/WebService/";
+    private String server = "http://2016030023.000webhostapp.com/WebService/";
     private TableLayout listaContactos;
     private View helpView;
 
@@ -49,6 +49,7 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
         setContentView(R.layout.activity_list);
         contactos = new ArrayList<>();
         queue = Volley.newRequestQueue(context);
+        php.setContext(ListActivity.this);
         consultarTodosWebService();
         listaContactos = findViewById(R.id.listContactos);
         btnNuevo = findViewById(R.id.btnNuevo);
@@ -61,7 +62,7 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
         });
     }
 
-    private void consultarTodosWebService () {
+    public void consultarTodosWebService () {
         String url = server + "wsConsultarTodos.php?idMovil=" + Divice.getSecureId(this);
         request = new JsonObjectRequest(Request.Method.GET, url, null, this, this);
         queue.add(request);
@@ -69,32 +70,45 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
 
     @Override
     public void onErrorResponse(VolleyError error) {
-
+        error.printStackTrace();
+        mensajeCorto("Error al consultar los datos");
     }
 
     @Override
     public void onResponse(JSONObject response) {
         Contactos contacto = null;
-        JSONArray data = response.optJSONArray("contactos");
+        int code = 0;
         try {
-            for (int i = 0; i < data.length(); i++) {
-                contacto = new Contactos();
-                JSONObject json = data.getJSONObject(i);
-                contacto.set_ID(json.optInt("_ID"));
-                contacto.setNombre(json.optString("nombre"));
-                contacto.setDireccion(json.optString("direccion"));
-                contacto.setTelefono2(json.optString("telefono2"));
-                contacto.setTelefono1(json.optString("telefono1"));
-                contacto.setNotas(json.optString("notas"));
-                contacto.setFavorite(json.optInt("favorite"));
-                contacto.setIdMovil(json.optString("idMovil"));
-                contactos.add(contacto);
+            code = response.getInt("code");
+        } catch (Exception ex) {
+            mensajeCorto("Error: " + ex.getMessage());
+        }
+        if (code == 1) {
+            JSONArray data = response.optJSONArray("contactos");
+            try {
+                contactos = new ArrayList<>();
+                for (int i = 0; i < data.length(); i++) {
+                    contacto = new Contactos();
+                    JSONObject json = data.getJSONObject(i);
+                    contacto.set_ID(json.optInt("_ID"));
+                    contacto.setNombre(json.optString("nombre"));
+                    contacto.setDireccion(json.optString("direccion"));
+                    contacto.setTelefono2(json.optString("telefono2"));
+                    contacto.setTelefono1(json.optString("telefono1"));
+                    contacto.setNotas(json.optString("notas"));
+                    contacto.setFavorite(json.optInt("favorite"));
+                    contacto.setIdMovil(json.optString("idMovil"));
+                    contactos.add(contacto);
+                }
                 cargarContactos();
             }
+            catch (Exception ex){
+                ex.printStackTrace();
+                mensajeCorto("Error con la petición");
+            }
         }
-        catch (Exception ex){
-            ex.printStackTrace();
-            mensajeCorto("Error con la petición");
+        else {
+            mensajeCorto("No hay contactos");
         }
     }
 
@@ -102,15 +116,22 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
     }
 
-    private void cargarContactos () {
+    private void mensajeLargo (String mensaje) {
+        Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show();
+    }
+
+    public void cargarContactos () {
         try {
             listaContactos.removeAllViews();
             for (Contactos contacto : contactos) {
                 TableRow nRow = new TableRow(ListActivity.this);
-                nRow.setOrientation(TableRow.VERTICAL);
 
-                LinearLayout fila1 = new LinearLayout(this);
-                fila1.setOrientation(LinearLayout.HORIZONTAL);
+                TableLayout nTable = new TableLayout(ListActivity.this);
+                nTable.setOrientation(TableLayout.HORIZONTAL);
+                nTable.setStretchAllColumns(true);
+
+                TableRow infoCol = new TableRow(this);
+                infoCol.setOrientation(TableRow.VERTICAL);
 
                 TextView lblNombre = new TextView(this);
                 lblNombre.setText(contacto.getNombre());
@@ -131,11 +152,11 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
                         finish();
                     }
                 });
-                fila1.addView(lblNombre);
-                fila1.addView(btnModificar);
+                infoCol.addView(lblNombre);
+                infoCol.addView(btnModificar);
 
-                LinearLayout fila2 = new LinearLayout(this);
-                fila2.setOrientation(LinearLayout.HORIZONTAL);
+                TableRow actionCol = new TableRow(this);
+                actionCol.setOrientation(TableRow.VERTICAL);
 
                 TextView lblTel1 = new TextView(this);
                 lblTel1.setText(contacto.getTelefono1());
@@ -158,8 +179,7 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
                                 public void onClick(DialogInterface dialog, int which) {
                                     int pos = (int) helpView.getTag(R.string.pos);
                                     int id = contactos.get(pos).get_ID();
-                                    php.borrarContacto(id);
-                                    cargarContactos();
+                                    php.borrarContacto(id, ListActivity.this);
                                 }
                             });
                             dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -176,16 +196,13 @@ public class ListActivity extends AppCompatActivity implements Response.Listener
                     }
                 });
 
-                fila2.addView(lblTel1);
-                fila2.addView(btnDel);
+                actionCol.addView(lblTel1);
+                actionCol.addView(btnDel);
 
-                LinearLayout filaPadre = new LinearLayout(this);
-                filaPadre.setOrientation(LinearLayout.VERTICAL);
+                nTable.addView(infoCol);
+                nTable.addView(actionCol);
 
-                filaPadre.addView(fila1);
-                filaPadre.addView(fila2);
-
-                nRow.addView(filaPadre);
+                nRow.addView(nTable);
                 listaContactos.addView(nRow);
             }
         }

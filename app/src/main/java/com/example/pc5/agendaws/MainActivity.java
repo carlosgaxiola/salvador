@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 txtTel2.setText(contacto.getTelefono2());
                 txtTel1.setText(contacto.getTelefono1());
                 txtDir.setText(contacto.getDireccion());
-                txtNombre.setText(contacto.getNotas());
+                txtNotas.setText(contacto.getNotas());
                 cbxFav.setChecked(contacto.getFavorite() == 1);
             }
             else {
