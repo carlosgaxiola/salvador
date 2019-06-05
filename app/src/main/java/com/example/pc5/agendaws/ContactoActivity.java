@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -30,29 +31,6 @@ public class ContactoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacto);
         this.initComponents();
-        this.getContacto();
-    }
-
-    private void getContacto () {
-        try {
-            Intent intent = getIntent();
-            Bundle datos = intent.getExtras();
-            contacto = (Contactos) datos.getSerializable("contacto");
-            if (contacto != null) {
-                txtNombre.setText(contacto.getNombre());
-                txtTel2.setText(contacto.getTelefono2());
-                txtTel1.setText(contacto.getTelefono1());
-                txtDir.setText(contacto.getDireccion());
-                txtNotas.setText(contacto.getNotas());
-                cbxFav.setChecked(contacto.getFavorite() == 1);
-                getSupportActionBar().setTitle("Editar Contacto");
-            } else {
-                getSupportActionBar().setTitle("Nuevo Contacto");
-            }
-        }
-        catch (Exception ex) {
-            mensajeCorto("Error getContacto: " + ex.getMessage());
-        }
     }
 
     private void initComponents () {
@@ -159,7 +137,39 @@ public class ContactoActivity extends AppCompatActivity {
     }
 
     public void exito () {
-        setResult(RESULT_OK);
-        finish();
+        Intent intent = new Intent(ContactoActivity.this, ListarActivity.class);
+        startActivityForResult(intent, RESULT_OK);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        mensajeCorto("ActivityResult" +  resultCode);
+        if (resultCode == RESULT_OK) {
+            Bundle datos = intent.getExtras();
+            contacto = (Contactos) datos.getSerializable("contacto");
+            if (contacto !=  null) {
+                txtNombre.setText(contacto.getNombre());
+                txtTel2.setText(contacto.getTelefono2());
+                txtTel1.setText(contacto.getTelefono1());
+                txtDir.setText(contacto.getDireccion());
+                txtNotas.setText(contacto.getNotas());
+                cbxFav.setChecked(contacto.getFavorite() == 1);
+                getSupportActionBar().setTitle("Editar Contacto");
+            }
+            else {
+                limpiar(null);
+                getSupportActionBar().setTitle("Nuevo Contacto");
+            }
+        }
+        else {
+            limpiar(null);
+            getSupportActionBar().setTitle("Nuevo Contacto");
+        }
+    }
+
+    public void listar (View view) {
+        Intent intent = new Intent(ContactoActivity.this, ListarActivity.class);
+        startActivityForResult(intent, RESULT_OK);
     }
 }

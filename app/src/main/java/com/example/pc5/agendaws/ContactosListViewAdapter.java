@@ -1,5 +1,6 @@
 package com.example.pc5.agendaws;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -96,7 +97,9 @@ public class ContactosListViewAdapter extends BaseAdapter {
                     data.putSerializable("contacto", arrayList.get(position));
                     Intent intent = new Intent(mContext, ContactoActivity.class);
                     intent.putExtras(data);
-                    ((ListarActivity) mContext).showForm(intent);
+                    Toast.makeText(mContext, "click", Toast.LENGTH_SHORT).show();
+                    ((ListarActivity) mContext).setResult(Activity.RESULT_OK, intent);
+                    ((ListarActivity) mContext).finish();
                 }
                 catch (Exception ex) {
                     Toast.makeText(mContext, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -108,7 +111,7 @@ public class ContactosListViewAdapter extends BaseAdapter {
     }
 
     public void filter (String critter) {
-        critter = critter.toLowerCase(Locale.getDefault());
+        critter = critter.toLowerCase();
         contactosList.clear();
         if (critter.length() == 0) {
             contactosList.addAll(arrayList);
@@ -116,7 +119,7 @@ public class ContactosListViewAdapter extends BaseAdapter {
         else {
             for (Contactos contacto : arrayList) {
                 boolean match = contacto.getNombre()
-                        .toLowerCase(Locale.getDefault())
+                        .toLowerCase()
                         .contains(critter);
                 if (match) {
                     contactosList.add(contacto);

@@ -41,7 +41,8 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
     private ArrayList<Contactos> contactos;
     private String server = "http://2016030023.000webhostapp.com/WebService/";
     private ListView listaContactos;
-    private ContactosListViewAdapter adapter;
+    private ContactosListViewAdapter adapter = null;
+   
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +57,8 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
             btnNuevo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(ListarActivity.this, ContactoActivity.class);
-                    startActivityForResult(intent, Activity.RESULT_OK);
+                    setResult(RESULT_CANCELED);
+                    finish();
                 }
             });
         }
@@ -156,18 +157,5 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
 
     public void borrar (int id) {
         php.borrarContacto(id, this);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            this.consultarTodosWebService();
-        }
-    }
-
-    public void showForm (Intent intent) {
-        startActivityForResult(intent, RESULT_OK);
-        this.consultarTodosWebService();
     }
 }
