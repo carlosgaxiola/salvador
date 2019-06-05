@@ -40,40 +40,30 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
     private JsonObjectRequest request;
     private ArrayList<Contactos> contactos;
     private String server = "http://2016030023.000webhostapp.com/WebService/";
-    private View helpView;
     private ListView listaContactos;
     private ContactosListViewAdapter adapter;
-    private int linea = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listar);
         try {
             queue = Volley.newRequestQueue(context);
-            linea++;
             php.setContext(ListarActivity.this);
-            linea++;
             listaContactos = findViewById(R.id.listaContactos);
-            linea++;
+            contactos = new ArrayList<>();
             consultarTodosWebService();
-            linea++;
             btnNuevo = findViewById(R.id.btnNuevo);
-            linea++;
             btnNuevo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(ListarActivity.this, ContactoActivity.class);
-                    linea++;
                     startActivityForResult(intent, Activity.RESULT_OK);
-                    linea++;
                 }
             });
-            linea++;
         }
         catch (Exception ex) {
             mensajeCorto("Error: " + ex.getMessage());
             ex.printStackTrace();
-            mensajeCorto("Linea: " + linea);
         }
     }
 
@@ -101,7 +91,7 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
         if (code == 1) {
             JSONArray data = response.optJSONArray("contactos");
             try {
-                contactos = new ArrayList<>();
+                contactos.removeAll(contactos);
                 for (int i = 0; i < data.length(); i++) {
                     contacto = new Contactos();
                     JSONObject json = data.getJSONObject(i);
@@ -115,8 +105,13 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
                     contacto.setIdMovil(json.optString("idMovil"));
                     contactos.add(contacto);
                 }
-                adapter = new ContactosListViewAdapter(this, contactos);
-                listaContactos.setAdapter(adapter);;
+                if (adapter == null) {
+                    adapter = new ContactosListViewAdapter(ListarActivity.this, contactos);
+                    listaContactos.setAdapter(adapter);
+                }
+                else {
+                    adapter.notifyDataSetChanged();
+                }
             }
             catch (Exception ex){
                 ex.printStackTrace();
@@ -166,8 +161,13 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             this.consultarTodosWebService();
         }
+    }
+
+    public void showForm (Intent intent) {
+        startActivityForResult(intent, RESULT_OK);
+        this.consultarTodosWebService();
     }
 }

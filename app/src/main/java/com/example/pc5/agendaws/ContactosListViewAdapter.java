@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.pc5.agendaws.Objetos.Contactos;
 
@@ -62,6 +64,8 @@ public class ContactosListViewAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
         holder.nombre.setText(arrayList.get(position).getNombre());
+        if (arrayList.get(position).getFavorite() == 1)
+            holder.nombre.setTextColor(Color.BLUE);
         holder.tel1.setText(arrayList.get(position).getTelefono1());
         holder.btnDel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,10 +83,7 @@ public class ContactosListViewAdapter extends BaseAdapter {
                 });
                 dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
+                    public void onClick(DialogInterface dialog, int which) { } });
                 dialog.show();
             }
         });
@@ -90,11 +91,16 @@ public class ContactosListViewAdapter extends BaseAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Bundle data = new Bundle();
-                data.putSerializable("contacto", arrayList.get(position));
-                Intent intent = new Intent(mContext, ContactoActivity.class);
-                intent.putExtras(data);
-                mContext.startActivity(intent);
+                try {
+                    Bundle data = new Bundle();
+                    data.putSerializable("contacto", arrayList.get(position));
+                    Intent intent = new Intent(mContext, ContactoActivity.class);
+                    intent.putExtras(data);
+                    ((ListarActivity) mContext).showForm(intent);
+                }
+                catch (Exception ex) {
+                    Toast.makeText(mContext, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

@@ -34,33 +34,42 @@ public class ContactoActivity extends AppCompatActivity {
     }
 
     private void getContacto () {
-        Intent intent = getIntent();
-        Bundle datos = intent.getExtras();
-        contacto = (Contactos) datos.getSerializable("contacto");
-        if (contacto != null) {
-            txtNombre.setText(contacto.getNombre());
-            txtTel2.setText(contacto.getTelefono2());
-            txtTel1.setText(contacto.getTelefono1());
-            txtDir.setText(contacto.getDireccion());
-            txtNotas.setText(contacto.getNotas());
-            cbxFav.setChecked(contacto.getFavorite() == 1);
-            getActionBar().setTitle("Editar Contacto");
+        try {
+            Intent intent = getIntent();
+            Bundle datos = intent.getExtras();
+            contacto = (Contactos) datos.getSerializable("contacto");
+            if (contacto != null) {
+                txtNombre.setText(contacto.getNombre());
+                txtTel2.setText(contacto.getTelefono2());
+                txtTel1.setText(contacto.getTelefono1());
+                txtDir.setText(contacto.getDireccion());
+                txtNotas.setText(contacto.getNotas());
+                cbxFav.setChecked(contacto.getFavorite() == 1);
+                getSupportActionBar().setTitle("Editar Contacto");
+            } else {
+                getSupportActionBar().setTitle("Nuevo Contacto");
+            }
         }
-        else {
-            getActionBar().setTitle("Nuevo Contacto");
+        catch (Exception ex) {
+            mensajeCorto("Error getContacto: " + ex.getMessage());
         }
     }
 
     private void initComponents () {
-        this.php = new ProcesosPHP();
-        php.setContext(this);
-        this.txtNombre = findViewById(R.id.txtNombre);
-        this.txtDir = findViewById(R.id.txtDir);
-        this.txtTel1 = findViewById(R.id.txtTel1);
-        this.txtTel2 = findViewById(R.id.txtTel2);
-        this.txtNotas = findViewById(R.id.txtNotas);
-        this.cbxFav = findViewById(R.id.cbxFav);
-        this.contacto = null;
+        try {
+            this.php = new ProcesosPHP();
+            php.setContext(this);
+            this.txtNombre = findViewById(R.id.txtNombre);
+            this.txtDir = findViewById(R.id.txtDir);
+            this.txtTel1 = findViewById(R.id.txtTel1);
+            this.txtTel2 = findViewById(R.id.txtTel2);
+            this.txtNotas = findViewById(R.id.txtNotas);
+            this.cbxFav = findViewById(R.id.cbxFav);
+            this.contacto = null;
+        }
+        catch (Exception ex) {
+            mensajeCorto("Error init: " + ex.getMessage());
+        }
     }
 
     public void guardar (View view) {
@@ -150,7 +159,7 @@ public class ContactoActivity extends AppCompatActivity {
     }
 
     public void exito () {
-        this.setResult(Activity.RESULT_OK);
+        setResult(RESULT_OK);
         finish();
     }
 }
