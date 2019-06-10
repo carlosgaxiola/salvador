@@ -111,6 +111,7 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
                     listaContactos.setAdapter(adapter);
                 }
                 else {
+                    apdater.updateData();
                     adapter.notifyDataSetChanged();
                 }
             }

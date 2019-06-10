@@ -128,4 +128,9 @@ public class ContactosListViewAdapter extends BaseAdapter {
         }
         notifyDataSetChanged();
     }
+
+    public void updateDate () {
+        this.contactosList.clear();
+        this.contactosList.addAll(this.arrayList);
+    }
 }
