@@ -107,7 +107,7 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
                     contacto.setIdMovil(json.optString("idMovil"));
                     contactos.add(contacto);
                 }
-                adapter = new ContactosListViewAdapter(ListarActivity.this, contactos);
+                adapter = new ContactosListViewAdapter(ListarActivity.this, R.id.row, contactos);
                 listaContactos.setAdapter(adapter);
             }
             catch (Exception ex){
@@ -138,15 +138,8 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
 
             @Override
             public boolean onQueryTextChange(String s) {
-                mensajeCorto(s);
-                if (TextUtils.isEmpty(s)) {
-                  adapter.filter("");
-                  listaContactos.clearTextFilter();
-                }
-                else {
-                    adapter.filter(s);
-                }
-                return true;
+                adapter.getFilter().filter(s);
+                return false;
             }
         });
         return true;
