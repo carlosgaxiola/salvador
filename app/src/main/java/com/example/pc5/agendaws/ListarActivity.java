@@ -57,8 +57,9 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
             btnNuevo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setResult(RESULT_CANCELED);
+                    Intent intent = new Intent(ListarActivity.this, ContactoActivity.class);
                     finish();
+                    startActivity(intent);
                 }
             });
         }
@@ -92,7 +93,7 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
         if (code == 1) {
             JSONArray data = response.optJSONArray("contactos");
             try {
-                contactos.removeAll(contactos);
+                contactos = new ArrayList<>();
                 for (int i = 0; i < data.length(); i++) {
                     contacto = new Contactos();
                     JSONObject json = data.getJSONObject(i);
@@ -106,14 +107,8 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
                     contacto.setIdMovil(json.optString("idMovil"));
                     contactos.add(contacto);
                 }
-                if (adapter == null) {
-                    adapter = new ContactosListViewAdapter(ListarActivity.this, contactos);
-                    listaContactos.setAdapter(adapter);
-                }
-                else {
-                    apdater.updateData();
-                    adapter.notifyDataSetChanged();
-                }
+                adapter = new ContactosListViewAdapter(ListarActivity.this, contactos);
+                listaContactos.setAdapter(adapter);
             }
             catch (Exception ex){
                 ex.printStackTrace();
@@ -143,6 +138,7 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
 
             @Override
             public boolean onQueryTextChange(String s) {
+                mensajeCorto(s);
                 if (TextUtils.isEmpty(s)) {
                   adapter.filter("");
                   listaContactos.clearTextFilter();

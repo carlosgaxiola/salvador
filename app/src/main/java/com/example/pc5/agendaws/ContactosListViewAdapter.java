@@ -1,6 +1,5 @@
 package com.example.pc5.agendaws;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,20 +18,22 @@ import com.example.pc5.agendaws.Objetos.Contactos;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class ContactosListViewAdapter extends BaseAdapter {
 
     private Context mContext;
     private List contactosList;
-    private ArrayList<Contactos> arrayList;
+    private ArrayList<Contactos> contactosTemp;
+    private ArrayList<Contactos> contactos;
     private LayoutInflater inflater;
 
     public ContactosListViewAdapter(Context mContext, List<Contactos> contactosList) {
         this.mContext = mContext;
         this.contactosList = contactosList;
-        this.arrayList = new ArrayList<>();
-        this.arrayList.addAll(contactosList);
+        this.contactos = new ArrayList<>();
+        this.contactos.addAll(contactosList);
+        this.contactosTemp = new ArrayList<>();
+        this.contactosTemp.addAll(contactosList);
         this.inflater = LayoutInflater.from(this.mContext);
     }
 
@@ -45,10 +46,10 @@ public class ContactosListViewAdapter extends BaseAdapter {
     public int getCount() { return this.contactosList.size(); }
 
     @Override
-    public Object getItem(int position) { return this.arrayList.get(position); }
+    public Object getItem(int position) { return this.contactosTemp.get(position); }
 
     @Override
-    public long getItemId(int position) { return this.arrayList.get(position).get_ID(); }
+    public long getItemId(int position) { return this.contactosTemp.get(position).get_ID(); }
 
     @Override
     public View getView(final int position, View view, ViewGroup parent) {
@@ -64,22 +65,22 @@ public class ContactosListViewAdapter extends BaseAdapter {
         else {
             holder = (ViewHolder) view.getTag();
         }
-        holder.nombre.setText(arrayList.get(position).getNombre());
-        if (arrayList.get(position).getFavorite() == 1)
+        holder.nombre.setText(contactosTemp.get(position).getNombre());
+        if (contactosTemp.get(position).getFavorite() == 1)
             holder.nombre.setTextColor(Color.BLUE);
-        holder.tel1.setText(arrayList.get(position).getTelefono1());
+        holder.tel1.setText(contactosTemp.get(position).getTelefono1());
         holder.btnDel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
                 dialog.setTitle("Borrar contacto");
-                String nombre = arrayList.get(position).getNombre();
+                String nombre = contactosTemp.get(position).getNombre();
                 dialog.setMessage("¿Se borrara el contacto " + nombre + "?");
                 dialog.setCancelable(false);
                 dialog.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((ListarActivity) mContext).borrar(arrayList.get(position).get_ID());
+                        ((ListarActivity) mContext).borrar(contactosTemp.get(position).get_ID());
                     }
                 });
                 dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -94,12 +95,11 @@ public class ContactosListViewAdapter extends BaseAdapter {
             public void onClick(View view) {
                 try {
                     Bundle data = new Bundle();
-                    data.putSerializable("contacto", arrayList.get(position));
+                    data.putSerializable("contacto", contactosTemp.get(position));
                     Intent intent = new Intent(mContext, ContactoActivity.class);
                     intent.putExtras(data);
-                    Toast.makeText(mContext, "click", Toast.LENGTH_SHORT).show();
-                    ((ListarActivity) mContext).setResult(Activity.RESULT_OK, intent);
                     ((ListarActivity) mContext).finish();
+                    mContext.startActivity(intent);
                 }
                 catch (Exception ex) {
                     Toast.makeText(mContext, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -112,25 +112,36 @@ public class ContactosListViewAdapter extends BaseAdapter {
 
     public void filter (String critter) {
         critter = critter.toLowerCase();
-        contactosList.clear();
+        contactosTemp = new ArrayList<>();
         if (critter.length() == 0) {
-            contactosList.addAll(arrayList);
+            contactosTemp.addAll(contactos);
         }
         else {
-            for (Contactos contacto : arrayList) {
-                boolean match = contacto.getNombre()
-                        .toLowerCase()
-                        .contains(critter);
-                if (match) {
-                    contactosList.add(contacto);
+            for (Contactos con : contactos) {
+                Toast.makeText(mContext, con.getNombre().toLowerCase(),
+                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Contiene " + con.getNombre().toLowerCase()
+                                .contains(critter),
+                        Toast.LENGTH_SHORT).show();
+                if (con.getNombre().toLowerCase().contains(critter)) {
+                    boolean added = contactosTemp.add(con);
+                    Toast.makeText(mContext, "contacto " + con.getNombre() +
+                                    " agregado " + added,
+                            Toast.LENGTH_SHORT).show();
                 }
+            }
+            for (int i = 0; i < contactosTemp.size(); i++) {
+                Toast.makeText(mContext, "contacto " +
+                        contactosTemp.get(i).getNombre(), Toast.LENGTH_SHORT)
+                        .show();
             }
         }
         notifyDataSetChanged();
     }
 
-    public void updateDate () {
+    public void updateData (ArrayList<Contactos> contactos) {
+        this.contactosTemp = contactos;
         this.contactosList.clear();
-        this.contactosList.addAll(this.arrayList);
+        this.contactosList.addAll(this.contactosTemp);
     }
 }

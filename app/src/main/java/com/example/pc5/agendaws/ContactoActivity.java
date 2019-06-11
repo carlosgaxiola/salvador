@@ -31,6 +31,27 @@ public class ContactoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacto);
         this.initComponents();
+        this.getContacto();
+    }
+
+    private void getContacto () {
+        try {
+          Intent intent = getIntent();
+          Bundle data = intent.getExtras();
+          Contactos contacto = (Contactos) data.getSerializable("contacto");
+          if (contacto != null) {
+              this.txtNombre.setText(contacto.getNombre());
+              this.txtDir.setText(contacto.getDireccion());
+              this.txtTel1.setText(contacto.getTelefono1());
+              this.txtTel2.setText(contacto.getTelefono2());
+              this.txtNotas.setText(contacto.getNotas());
+              this.cbxFav.setChecked(contacto.getFavorite() == 1);
+              this.contacto = contacto;
+              getSupportActionBar().setTitle("Nuevo Contacto");
+          }
+        } catch (Exception ex) {
+
+        }
     }
 
     private void initComponents () {
@@ -46,7 +67,7 @@ public class ContactoActivity extends AppCompatActivity {
             this.contacto = null;
         }
         catch (Exception ex) {
-            mensajeCorto("Error init: " + ex.getMessage());
+
         }
     }
 
@@ -76,6 +97,7 @@ public class ContactoActivity extends AppCompatActivity {
                 }
                 else if (this.contacto == null) {
                     php.insertarContacto(nContacto, ContactoActivity.this);
+                    limpiar(null);
                 }
                 else if (noHayCambios()) {
                     finish();
@@ -91,6 +113,7 @@ public class ContactoActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             php.actualizarContacto(contacto, contacto.get_ID(), ContactoActivity.this);
+                            limpiar(null);
                         }
                     });
                     dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -136,9 +159,11 @@ public class ContactoActivity extends AppCompatActivity {
         return netinfo != null && netinfo.isConnected();
     }
 
-    public void exito () {
+    public void exito (Contactos contacto) {
         Intent intent = new Intent(ContactoActivity.this, ListarActivity.class);
-        startActivityForResult(intent, RESULT_OK);
+        intent.putExtra("contacto", contacto);
+        finish();
+        startActivity(intent);
     }
 
     @Override
@@ -170,6 +195,8 @@ public class ContactoActivity extends AppCompatActivity {
 
     public void listar (View view) {
         Intent intent = new Intent(ContactoActivity.this, ListarActivity.class);
-        startActivityForResult(intent, RESULT_OK);
+        intent.putExtra("contactos", new Contactos());
+        finish();
+        startActivity(intent);
     }
 }

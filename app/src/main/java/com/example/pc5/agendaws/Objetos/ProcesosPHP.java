@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.android.volley.Request;
@@ -23,6 +24,7 @@ public class ProcesosPHP {
     private JsonObjectRequest json;
     private ArrayList<Contactos> contactos = new ArrayList<>();
     private String serverip = "http://2016030023.000webhostapp.com/WebService/";
+    private Contactos contactoHolder;
 
     public void setContext (Context context) {
         this.request = Volley.newRequestQueue(context);
@@ -37,6 +39,7 @@ public class ProcesosPHP {
                 "&favorite=" + contacto.getFavorite() +
                 "&idMovil=" + contacto.getIdMovil();
         url = url.replace(" ", "%20");
+        this.contactoHolder = contacto;
         json = new JsonObjectRequest(Request.Method.GET, url, null,
             new Response.Listener<JSONObject>() {
                 @Override
@@ -45,7 +48,16 @@ public class ProcesosPHP {
                         int code = data.getInt("code");
                         if (code == 1) {
                             mensajeCorto("Contacto agregado!", context);
-                            context.exito();
+                            int _ID = 0;
+                            try {
+                                _ID = data.getInt("_ID");
+                            } catch (Exception ex) {
+                                JSONArray contactos = data.getJSONArray("contactos");
+                                JSONObject con = contactos.getJSONObject(0);
+                                _ID = con.getInt("_ID");
+                            }
+                            contactoHolder.set_ID(_ID);
+                            context.exito(contactoHolder);
                         }
                         else {
                             mensajeCorto("No se pudo agregar el contacto", context);
@@ -78,6 +90,7 @@ public class ProcesosPHP {
                 "&favorite=" + contacto.getFavorite() +
                 "&notas=" + contacto.getNotas();
         url = url.replace(" ", "%20");
+        this.contactoHolder = contacto;
         json = new JsonObjectRequest(Request.Method.GET, url, null,
             new Response.Listener<JSONObject>() {
                 @Override
@@ -95,7 +108,7 @@ public class ProcesosPHP {
                             case 0:
                             case 1:
                                 mensajeCorto("Contacto actualizado", context);
-                                context.exito();
+                                context.exito(contactoHolder);
                                 break;
                         }
                     }
