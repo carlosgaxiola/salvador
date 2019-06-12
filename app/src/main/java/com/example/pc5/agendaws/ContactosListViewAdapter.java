@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.ImageButton;
@@ -21,19 +20,17 @@ import com.example.pc5.agendaws.Objetos.Contactos;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactosListViewAdapter extends ArrayAdapter<Contactos> {
+public class ContactosListViewAdapter extends BaseAdapter {
 
     private Context mContext;
-    private List contactosList;
     private ArrayList<Contactos> contactos;
+    private ArrayList<Contactos> copyContactos = new ArrayList<>();;
     private LayoutInflater inflater;
 
-    public ContactosListViewAdapter(Context context, int resource, List<Contactos> objects) {
-        super(context, resource, objects);
+    public ContactosListViewAdapter(Context context, ArrayList<Contactos> objects) {
         this.mContext = context;
-        this.contactosList = objects;
-        this.contactos = new ArrayList<>();
-        this.contactos.addAll(contactosList);
+        this.contactos = objects;
+        this.copyContactos.addAll(contactos);
         this.inflater = LayoutInflater.from(this.mContext);
     }
 
@@ -43,13 +40,13 @@ public class ContactosListViewAdapter extends ArrayAdapter<Contactos> {
     }
 
     @Override
-    public int getCount() { return this.contactosList.size(); }
+    public int getCount() { return this.contactos.size(); }
 
     @Override
-    public Contactos getItem(int position) { return this.contactos.get(position); }
+    public Contactos getItem(int position) { return this.copyContactos.get(position); }
 
     @Override
-    public long getItemId(int position) { return this.contactos.get(position).get_ID(); }
+    public long getItemId(int position) { return this.copyContactos.get(position).get_ID(); }
 
     @Override
     public View getView(final int position, View view, ViewGroup parent) {
@@ -110,49 +107,18 @@ public class ContactosListViewAdapter extends ArrayAdapter<Contactos> {
         return view;
     }
 
-    @Override
-    public Filter getFilter(final ContactosListViewAdapter adapter) {
-        final Filter filter = new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-
-            }
-
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                List<Contactos> arrayListContactos = (List<Contactos>) filterResults.values;
-                adapter.notifyDataSetChanged();
-            }
-        };
-        return filter;
-    }
-
-    /*public void filter (String critter) {
-        critter = critter.toLowerCase();
-        this.contactosList.clear();
+    public void filtrar (String critter) {
+        this.contactos.clear();
         if (critter.length() == 0) {
-            this.contactosList.addAll(contactos);
+            this.contactos.addAll(copyContactos);
         }
         else {
-            for (Contactos con : contactos) {
-                Toast.makeText(mContext, con.getNombre().toLowerCase(),
-                        Toast.LENGTH_SHORT).show();
-                Toast.makeText(mContext, "Contiene " + con.getNombre().toLowerCase()
-                                .contains(critter),
-                        Toast.LENGTH_SHORT).show();
+            for (Contactos con : copyContactos) {
                 if (con.getNombre().toLowerCase().contains(critter)) {
-                    boolean added = this.contactosList.add(con);
-                    Toast.makeText(mContext, "contacto " + con.getNombre() +
-                                    " agregado " + added,
-                            Toast.LENGTH_SHORT).show();
+                    boolean added = this.contactos.add(con);
                 }
-            }
-            for (int i = 0; i < this.contactosList.size(); i++) {
-                Toast.makeText(mContext, "contacto " +
-                        ((Contactos)this.contactosList.get(i)).getNombre(), Toast.LENGTH_SHORT)
-                        .show();
             }
         }
         notifyDataSetChanged();
-    }*/
+    }
 }
