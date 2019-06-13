@@ -97,46 +97,18 @@ public class ContactoActivity extends AppCompatActivity {
                 }
                 else if (this.contacto == null) {
                     php.insertarContacto(nContacto, ContactoActivity.this);
-                    limpiar(null);
-                }
-                else if (noHayCambios()) {
-                    finish();
                 }
                 else {
                     nContacto.set_ID(contacto.get_ID());
                     nContacto.setIdMovil(contacto.getIdMovil());
                     this.contacto = nContacto;
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-                    dialog.setTitle("Modificar contacto");
-                    dialog.setMessage("¿Modificar los datos del contacto");
-                    dialog.setPositiveButton("Sí", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            php.actualizarContacto(contacto, contacto.get_ID(), ContactoActivity.this);
-                            limpiar(null);
-                        }
-                    });
-                    dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) { }
-                    });
-                    dialog.setCancelable(false);
-                    dialog.show();
+                    php.actualizarContacto(contacto, contacto.get_ID(), ContactoActivity.this);
                 }
             }
         }
         catch (Exception ex) {
             mensajeCorto("Error: " + ex.getMessage());
         }
-    }
-
-    private boolean noHayCambios () {
-        return this.contacto.getNombre().equals(this.txtNombre.getText().toString()) &&
-                this.contacto.getDireccion().equals(this.txtDir.getText().toString()) &&
-                this.contacto.getNotas().equals(this.txtNotas.getText().toString()) &&
-                this.contacto.getTelefono1().equals(this.txtTel1.getText().toString()) &&
-                this.contacto.getTelefono2().equals(this.txtTel2.getText().toString()) &&
-                (this.contacto.getFavorite() == 1) == this.cbxFav.isChecked();
     }
 
     private void mensajeCorto (String mensaje) {
@@ -164,33 +136,6 @@ public class ContactoActivity extends AppCompatActivity {
         intent.putExtra("contacto", contacto);
         finish();
         startActivity(intent);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        mensajeCorto("ActivityResult" +  resultCode);
-        if (resultCode == RESULT_OK) {
-            Bundle datos = intent.getExtras();
-            contacto = (Contactos) datos.getSerializable("contacto");
-            if (contacto !=  null) {
-                txtNombre.setText(contacto.getNombre());
-                txtTel2.setText(contacto.getTelefono2());
-                txtTel1.setText(contacto.getTelefono1());
-                txtDir.setText(contacto.getDireccion());
-                txtNotas.setText(contacto.getNotas());
-                cbxFav.setChecked(contacto.getFavorite() == 1);
-                getSupportActionBar().setTitle("Editar Contacto");
-            }
-            else {
-                limpiar(null);
-                getSupportActionBar().setTitle("Nuevo Contacto");
-            }
-        }
-        else {
-            limpiar(null);
-            getSupportActionBar().setTitle("Nuevo Contacto");
-        }
     }
 
     public void listar (View view) {

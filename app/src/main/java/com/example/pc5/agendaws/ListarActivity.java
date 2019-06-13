@@ -124,34 +124,6 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu (Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_action_activity, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) item.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                mensajeCorto(s);
-                if (TextUtils.isEmpty(s)) {
-                  adapter.filter("");
-                  listaContactos.clearTextFilter();
-                }
-                else {
-                    adapter.filter(s);
-                }
-                return true;
-            }
-        });
-        return true;
-    }
-
     public void borrar (int id) {
         php.borrarContacto(id, this);
     }
