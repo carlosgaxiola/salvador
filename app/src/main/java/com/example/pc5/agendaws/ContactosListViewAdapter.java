@@ -109,39 +109,4 @@ public class ContactosListViewAdapter extends BaseAdapter {
 
         return view;
     }
-
-    public void filter (String critter) {
-        critter = critter.toLowerCase();
-        contactosTemp = new ArrayList<>();
-        if (critter.length() == 0) {
-            contactosTemp.addAll(contactos);
-        }
-        else {
-            for (Contactos con : contactos) {
-                Toast.makeText(mContext, con.getNombre().toLowerCase(),
-                        Toast.LENGTH_SHORT).show();
-                Toast.makeText(mContext, "Contiene " + con.getNombre().toLowerCase()
-                                .contains(critter),
-                        Toast.LENGTH_SHORT).show();
-                if (con.getNombre().toLowerCase().contains(critter)) {
-                    boolean added = contactosTemp.add(con);
-                    Toast.makeText(mContext, "contacto " + con.getNombre() +
-                                    " agregado " + added,
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-            for (int i = 0; i < contactosTemp.size(); i++) {
-                Toast.makeText(mContext, "contacto " +
-                        contactosTemp.get(i).getNombre(), Toast.LENGTH_SHORT)
-                        .show();
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-    public void updateData (ArrayList<Contactos> contactos) {
-        this.contactosTemp = contactos;
-        this.contactosList.clear();
-        this.contactosList.addAll(this.contactosTemp);
-    }
 }

@@ -97,7 +97,6 @@ public class ContactoActivity extends AppCompatActivity {
                 }
                 else if (this.contacto == null) {
                     php.insertarContacto(nContacto, ContactoActivity.this);
-                    limpiar(null);
                 }
                 else if (noHayCambios()) {
                     finish();
@@ -113,7 +112,6 @@ public class ContactoActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             php.actualizarContacto(contacto, contacto.get_ID(), ContactoActivity.this);
-                            limpiar(null);
                         }
                     });
                     dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -164,33 +162,6 @@ public class ContactoActivity extends AppCompatActivity {
         intent.putExtra("contacto", contacto);
         finish();
         startActivity(intent);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        mensajeCorto("ActivityResult" +  resultCode);
-        if (resultCode == RESULT_OK) {
-            Bundle datos = intent.getExtras();
-            contacto = (Contactos) datos.getSerializable("contacto");
-            if (contacto !=  null) {
-                txtNombre.setText(contacto.getNombre());
-                txtTel2.setText(contacto.getTelefono2());
-                txtTel1.setText(contacto.getTelefono1());
-                txtDir.setText(contacto.getDireccion());
-                txtNotas.setText(contacto.getNotas());
-                cbxFav.setChecked(contacto.getFavorite() == 1);
-                getSupportActionBar().setTitle("Editar Contacto");
-            }
-            else {
-                limpiar(null);
-                getSupportActionBar().setTitle("Nuevo Contacto");
-            }
-        }
-        else {
-            limpiar(null);
-            getSupportActionBar().setTitle("Nuevo Contacto");
-        }
     }
 
     public void listar (View view) {
