@@ -58,6 +58,7 @@ public class ProcesosPHP {
                             }
                             contactoHolder.set_ID(_ID);
                             context.exito(contactoHolder);
+                            context.limpiar(null);
                         }
                         else {
                             mensajeCorto("No se pudo agregar el contacto", context);
@@ -109,6 +110,7 @@ public class ProcesosPHP {
                             case 1:
                                 mensajeCorto("Contacto actualizado", context);
                                 context.exito(contactoHolder);
+                                context.limpiar(null);
                                 break;
                         }
                     }

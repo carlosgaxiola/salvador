@@ -44,7 +44,7 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
     private ContactosListViewAdapter adapter = null;
    
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listar);
         try {
@@ -122,34 +122,6 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
 
     private void mensajeCorto (String mensaje) {
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu (Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_action_activity, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) item.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                mensajeCorto(s);
-                if (TextUtils.isEmpty(s)) {
-                  adapter.filter("");
-                  listaContactos.clearTextFilter();
-                }
-                else {
-                    adapter.filter(s);
-                }
-                return true;
-            }
-        });
-        return true;
     }
 
     public void borrar (int id) {
