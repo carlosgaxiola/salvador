@@ -116,7 +116,7 @@ public class ContactosListViewAdapter extends BaseAdapter {
         else {
             for (Contactos con : copyContactos) {
                 if (con.getNombre().toLowerCase().contains(critter)) {
-                    boolean added = this.contactos.add(con);
+                    this.contactos.add(con);
                 }
             }
         }
