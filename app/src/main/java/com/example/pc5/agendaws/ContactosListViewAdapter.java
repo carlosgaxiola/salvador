@@ -69,6 +69,7 @@ public class ContactosListViewAdapter extends BaseAdapter {
         holder.btnDel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ((ListarActivity) mContext).borrar(contactos.get(position).get_ID());
                 AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
                 dialog.setTitle("Borrar contacto");
                 String nombre = contactos.get(position).getNombre();
@@ -77,7 +78,7 @@ public class ContactosListViewAdapter extends BaseAdapter {
                 dialog.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((ListarActivity) mContext).borrar(contactos.get(position).get_ID());
+
                     }
                 });
                 dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
