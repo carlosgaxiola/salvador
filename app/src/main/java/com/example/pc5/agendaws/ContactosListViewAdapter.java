@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ public class ContactosListViewAdapter extends BaseAdapter {
     public class ViewHolder {
         TextView nombre, tel1;
         ImageButton btnDel;
+        LinearLayout row;
     }
 
     @Override
@@ -57,10 +59,22 @@ public class ContactosListViewAdapter extends BaseAdapter {
             holder.nombre = view.findViewById(R.id.lblNombre);
             holder.tel1 = view.findViewById(R.id.lblTel1);
             holder.btnDel = view.findViewById(R.id.btnDel);
+            holder.row = view.findViewById(R.id.row);
             view.setTag(holder);
         }
         else {
             holder = (ViewHolder) view.getTag();
+        }
+        try {
+            if (position % 2 == 0) {
+                holder.row.setBackgroundColor(mContext.getResources().getColor(R.color.odd));
+            }
+            else {
+                holder.row.setBackgroundColor(mContext.getResources().getColor(R.color.even));
+            }
+        }
+        catch (Exception ex) {
+            Toast.makeText(mContext, "Error con los colores", Toast.LENGTH_SHORT).show();
         }
         holder.nombre.setText(contactos.get(position).getNombre());
         if (contactos.get(position).getFavorite() == 1)
